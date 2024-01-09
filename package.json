@@ -1,7 +1,10 @@
 {
-  "name": "",
-  "version": "0.0.0",
-  "description": "",
+  "name": "playwright-redactor",
+  "version": "1.0.0",
+  "description": "Remove sensitive data from your Playwright trace files",
+  "author": {
+    "name": "Ryan Rosello"
+  },
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "files": [
@@ -10,7 +13,7 @@
   "license": "Apache-2.0",
   "keywords": [],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc",
@@ -20,8 +23,9 @@
     "posttest": "npm.cmd run lint"
   },
   "devDependencies": {
+    "@types/node": "20.8.2",
     "gts": "^5.2.0",
-    "typescript": "~5.2.0",
-    "@types/node": "20.8.2"
+    "jest": "^29.7.0",
+    "typescript": "~5.2.0"
   }
 }
