@@ -1,8 +1,9 @@
-import {existsSync, PathLike, readFileSync} from 'fs';
+import {existsSync, PathLike, readFileSync, statSync} from 'fs';
 import path from 'path';
 import {ICliConfig, ZodCliSchema} from './model';
 
 export const doPreChecks = async (
+  regexes: string,
   traceFilesFolderPath: string,
   configFile: string
 ): Promise<{
@@ -17,6 +18,14 @@ export const doPreChecks = async (
       status: 'error',
       message: `Trace file folder path does not exist: ${traceFilesFolderPath}:
       Use --trace-files <path> e.g. --trace-files="./trace_files/"`,
+    };
+  }
+
+  if (!fileExists(regexes)) {
+    return {
+      status: 'error',
+      message: `The text file containing the regexes does not exist: ${traceFilesFolderPath}:
+      Use --regexes <path> e.g. --regexes="./regex_redact.txt"`,
     };
   }
 
@@ -47,16 +56,24 @@ export const doPreChecks = async (
     };
   }
 
-  // ensure the regexes files exist and is not empty
-  if (!fileExists(config.regexes)) {
+  // ensure the regexes files is not empty
+  if (statSync(config.regexes).size === 0) {
     return {
       status: 'error',
-      message: `The regex text file does not exist: ${config.regexes}`,
+      message:
+        'The regex file is empty. Please add some regexes to the file and try again.',
     };
   }
 
   // iterate through each environment_variable and print warning
   // if its undefined
+  for (const e of config.environment_variables ?? []) {
+    if (process.env[e] === undefined) {
+      console.warn(
+        `WARNING: Environment variable ${e} is not defined in your shell.`
+      );
+    }
+  }
 
   return {
     status: 'ok',

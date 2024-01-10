@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 export interface ICliConfig {
-  logLevel: LogLevel;
+  log_level: LogLevel;
   environment_variables?: Array<string>;
   regexes: string;
   full_redaction: boolean;
@@ -17,7 +17,7 @@ type LogLevel =
   | 'debug';
 
 export const ZodCliSchema = z.object({
-  logLevel: z.enum([
+  log_level: z.enum([
     'emerg',
     'alert',
     'crit',
@@ -27,11 +27,7 @@ export const ZodCliSchema = z.object({
     'info',
     'debug',
   ]),
-  environment_variables: z
-    .object({
-      channels: z.array(z.string()).nonempty(),
-    })
-    .optional(),
+  environment_variables: z.array(z.string()).nonempty().optional(),
   regexes: z.string(),
   full_redaction: z.boolean().default(true),
 });

@@ -1,0 +1,10 @@
+{
+  "full_redaction": true,
+  "log_level": "info",
+  "environment_variables": [
+    "SUPER_SECRET_PASSWORD",
+    "SUPER_SECRET_API_KEY",
+    "MY_APP_SECRET",
+    "SALESFORCE_API_KEY"
+  ]
+}

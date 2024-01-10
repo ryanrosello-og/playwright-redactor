@@ -39,7 +39,7 @@ The config file is a JSON file that contains the following properties:
 ```json
 {
   "full_redaction": true,
-  "regexes": "./regex_replacements.txt",
+  "logLevel": "debug",
   "environment_variables": [
     "SUPER_SECRET_PASSWORD",
     "SUPER_SECRET_API_KEY",
@@ -49,7 +49,7 @@ The config file is a JSON file that contains the following properties:
 }
 ```
 
-The config file above will perform a full redaction whenever a regex is matched using the regexes defined in the `./regex_replacements.txt` file. It will also redact the environment variables listed in the `environment_variables` array.
+The config file above will perform a full redaction whenever a regex is matched using the regexes defined in the array. It will also redact the environment variables listed in the `environment_variables` array.
 
 | Options  |          |
 | -------- | -------- |

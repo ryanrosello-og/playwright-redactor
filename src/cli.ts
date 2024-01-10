@@ -1,5 +1,7 @@
 import {Command} from 'commander';
 import winston from 'winston';
+import doPreChecks from './cli_prechecks';
+import {ICliConfig} from './model';
 
 const logger = winston.createLogger({
   level: 'debug',
@@ -23,11 +25,23 @@ program
     '-t, --trace-files <path>',
     'Folder path containing the trace files that require scrubbing'
   )
+  .option(
+    '-r, --regexes <path>',
+    'Path to a file containing regexes to redact from the trace files'
+  )
   .option('-v, --version', `${name} @ ${version}`)
   .action(async options => {
+    const preCheckResult = await doPreChecks(
+      options.regexes,
+      options.traceFiles,
+      options.config
+    );
+    const config: ICliConfig = preCheckResult.config!;
+    if (preCheckResult.status === 'error') {
+      throw new Error(`❌ ${preCheckResult.message}`);
+    }
     // Do stuff
-    logger.debug('don');
-    console.log('sfsd');
+    logger.debug(config);
   });
 
 program.parse();
