@@ -5,22 +5,31 @@
   "author": {
     "name": "Ryan Rosello"
   },
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "build/src/cli.js",
   "files": [
     "build/src"
   ],
-  "license": "Apache-2.0",
-  "keywords": [],
+  "bin": {
+    "playwright-redactor": "build/src/cli.js"
+  },
+  "license": "MIT",
+  "keywords": [
+    "redact",
+    "report",
+    "playwright",
+    "typescript"
+  ],
   "scripts": {
     "test": "jest",
     "lint": "gts lint",
     "clean": "gts clean",
-    "compile": "tsc",
+    "build": "tsc -p ./tsconfig.json",
     "fix": "gts fix",
     "prepare": "npm.cmd run compile",
     "pretest": "npm.cmd run compile",
-    "posttest": "npm.cmd run lint"
+    "posttest": "npm.cmd run lint",
+    "cli": "yarn compile && npx .",
+    "cli-debug": "yarn build && npx . -c ./cli_config.json -t ./tests/test_data/valid_test_results/"
   },
   "devDependencies": {
     "@types/node": "20.8.2",
@@ -30,6 +39,7 @@
   },
   "dependencies": {
     "commander": "^11.1.0",
+    "winston": "^3.11.0",
     "zod": "^3.22.4"
   }
 }

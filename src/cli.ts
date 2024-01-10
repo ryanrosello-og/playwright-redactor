@@ -1,4 +1,11 @@
 import {Command} from 'commander';
+import winston from 'winston';
+
+const logger = winston.createLogger({
+  level: 'debug',
+  format: winston.format.json(),
+  transports: [new winston.transports.Console()],
+});
 
 const program = new Command();
 const name = 'playwright-redactor';
@@ -19,7 +26,8 @@ program
   .option('-v, --version', `${name} @ ${version}`)
   .action(async options => {
     // Do stuff
-    console.log({options});
+    logger.debug('don');
+    console.log('sfsd');
   });
 
 program.parse();
