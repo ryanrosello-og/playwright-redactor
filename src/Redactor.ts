@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-
+import AdmZip from 'adm-zip';
 export class Redactor {
   regexes: string[] = [];
   constructor(
@@ -44,7 +44,16 @@ export class Redactor {
     return 'todo';
   }
 
-  redactFile(filePath: string): string {}
+  unzip(filePath: string) {
+    const zip = new AdmZip(filePath);
+    const fileName = path.basename(filePath);
+    const extension = path.extname(filePath);
+    const outputFolder = path.join(
+      path.dirname(filePath),
+      fileName.replace(extension, '')
+    );
+    zip.extractAllTo(outputFolder);
+  }
 
   getAllZipFiles(dirPath: string, zipFiles?: string[]): string[] {
     const files = fs.readdirSync(dirPath);
