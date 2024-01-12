@@ -1,7 +1,23 @@
-export class Redactor {
-  constructor() {}
+import fs from 'fs';
+import path from 'path';
 
-  public redact(traceFolderPath: string): string {
+export class Redactor {
+  constructor(
+    private traceFolderPath: string,
+    private regexFile: string
+  ) {}
+
+  redact(): string {
+    const result = {
+      totalFiles: 0,
+      totalFilesRedacted: 0,
+      redactions: [],
+    };
+
+    console.log('🚀 ---------------------------------------🚀');
+    console.log('🚀 ~ Redactor ~ redact ~ result:', result);
+    console.log('🚀 ---------------------------------------🚀');
+
     // for each trace file in the folder:
     //   unzip to a temp folder
     //     for each file in the temp folder:
@@ -15,25 +31,30 @@ export class Redactor {
     //   re-zip the file using original name
     //   delete the temp folder
     //   update the stats
+    const traceFiles = this.getAllZipFiles(this.traceFolderPath);
 
-    const result = [
-      {
-        trace: 'trace1.zip',
-        file: 'file1',
-        lines: [
-          {
-            line: 1,
-            text: 'text1',
-            matches: [
-              {
-                regex: 'regex1',
-                match: 'match1',
-              },
-            ],
-          },
-        ],
-      },
-    ];
+    console.log('🚀 -----------------------------------------------🚀');
+    console.log('🚀 ~ Redactor ~ redact ~ traceFiles:', traceFiles);
+    console.log('🚀 -----------------------------------------------🚀');
+
     return 'todo';
+  }
+
+  getAllZipFiles(dirPath: string, zipFiles?: string[]): string[] {
+    const files = fs.readdirSync(dirPath);
+
+    zipFiles = zipFiles || [];
+
+    files.forEach(file => {
+      if (fs.statSync(dirPath + '/' + file).isDirectory()) {
+        zipFiles = this.getAllZipFiles(dirPath + '/' + file, zipFiles);
+      } else {
+        if (path.extname(file) === '.zip') {
+          zipFiles.push(path.join(dirPath, '/', file));
+        }
+      }
+    });
+
+    return zipFiles;
   }
 }

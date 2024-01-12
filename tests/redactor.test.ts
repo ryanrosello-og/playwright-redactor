@@ -1,0 +1,14 @@
+import {describe, expect, test} from 'vitest';
+import {Redactor} from '../src/Redactor';
+import path from 'path';
+
+const traceFilesFolder = path.join(__dirname, 'test_data', 'trace_files_many');
+const regexFile = path.join(__dirname, 'test_data', 'regex_redact.txt');
+
+describe('redactor', () => {
+  test('finds all zip files contained in a folder', async () => {
+    const redactor = new Redactor(traceFilesFolder, regexFile);
+    const zipFiles = redactor.getAllZipFiles(traceFilesFolder);
+    expect(zipFiles.length).toEqual(3);
+  });
+});
