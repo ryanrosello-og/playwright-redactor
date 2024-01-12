@@ -2,14 +2,45 @@ import AdmZip from 'adm-zip';
 import path from 'path';
 import fs from 'fs';
 
-export function unzip(filePath: string) {
-  const zip = new AdmZip(filePath);
-  const fileName = path.basename(filePath);
-  const extension = path.extname(filePath);
-  const outputFolder = path.join(
-    path.dirname(filePath),
-    fileName.replace(extension, '')
-  );
+export type Result<T> = {
+  success: boolean;
+  data?: T;
+  error?: string;
+};
+
+export function zip(filePath: string) {
+  // todo
+}
+
+export function getZipTargetFolder(zipFilePath: string) {
+  return zipFilePath.replace('.zip', '');
+}
+
+export function writeToFile(
+  filePath: string,
+  fileContents: string
+): Result<string> {
+  // todo
+}
+
+export function readFile(filePath: string): Result<string> {
+  try {
+    const data = fs.readFileSync(filePath, 'utf8');
+    return {
+      success: true,
+      data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+}
+
+export function unzip(zipFilePath: string) {
+  const zip = new AdmZip(zipFilePath);
+  const outputFolder = getZipTargetFolder(zipFilePath);
   zip.extractAllTo(outputFolder);
 }
 

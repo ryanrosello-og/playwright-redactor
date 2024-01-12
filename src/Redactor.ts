@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import AdmZip from 'adm-zip';
-import {unzip} from './fs_helper';
+import {getZipTargetFolder, unzip, zip} from './fs_helper';
 export class Redactor {
   regexes: string[] = [];
   constructor(
@@ -45,8 +45,20 @@ export class Redactor {
     return 'todo';
   }
 
-  redactFile(filePath: string) {
-    unzip(filePath);
+  redactFile(zipFilePath: string) {
+    unzip(zipFilePath);
+    this.applyRegexes(zipFilePath);
+    zip(zipFilePath);
+    // remove the unzip folder
+  }
+
+  applyRegexes(zipFilePath: string) {
+    const outputFolder = getZipTargetFolder(zipFilePath);
+    // filter for only .trace .stacs .network files
+    // for each file in the folder (filtered)
+    //  for each regex in the regex file: (or munge all regex into single regex)
+    //    if full_redact or partial_redact: .....
+    throw new Error('Function not implemented.');
   }
 
   getAllZipFiles(dirPath: string, zipFiles?: string[]): string[] {
