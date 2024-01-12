@@ -11,4 +11,12 @@ describe('redactor', () => {
     const zipFiles = redactor.getAllZipFiles(traceFilesFolder);
     expect(zipFiles.length).toEqual(3);
   });
+
+  test('parses regex from file into an array', async () => {
+    const redactor = new Redactor(traceFilesFolder, regexFile);
+    expect(redactor.regexes).toEqual([
+      '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+,',
+      '^(?:[\\w-]*\\.[\\w-]*\\.[\\w-]*)$',
+    ]);
+  });
 });

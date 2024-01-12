@@ -2,10 +2,14 @@ import fs from 'fs';
 import path from 'path';
 
 export class Redactor {
+  regexes: string[] = [];
   constructor(
     private traceFolderPath: string,
     private regexFile: string
-  ) {}
+  ) {
+    const data = fs.readFileSync(this.regexFile, 'utf8');
+    this.regexes = data.split('\n');
+  }
 
   redact(): string {
     const result = {
@@ -39,6 +43,8 @@ export class Redactor {
 
     return 'todo';
   }
+
+  redactFile(filePath: string): string {}
 
   getAllZipFiles(dirPath: string, zipFiles?: string[]): string[] {
     const files = fs.readdirSync(dirPath);
