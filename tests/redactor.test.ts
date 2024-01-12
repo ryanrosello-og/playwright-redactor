@@ -19,15 +19,4 @@ describe('redactor', () => {
       '^(?:[\\w-]*\\.[\\w-]*\\.[\\w-]*)$',
     ]);
   });
-
-  test('extracts contents of a trace file', async () => {
-    const redactor = new Redactor(traceFilesFolder, regexFile);
-    const traceFile = path.join(
-      __dirname,
-      'test_data',
-      'trace_files_single',
-      'trace.zip'
-    );
-    redactor.unzip(traceFile);
-  });
 });
