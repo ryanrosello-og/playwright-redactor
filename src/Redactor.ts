@@ -90,7 +90,7 @@ export class Redactor {
     for (const regex of this.regexes) {
       const redactionResult = this.doRegexReplace(
         fileContents,
-        new RegExp(regex)
+        new RegExp(regex, 'g')
       );
 
       if (redactionResult.matchCount > 0) {
@@ -112,9 +112,11 @@ export class Redactor {
   applyEnvVarRegex(file: string, fileContents: string) {
     const replacements = [];
     for (const e of this.config.environment_variables) {
+      if (!process.env[e]) continue;
+
       const redactionResult = this.doRegexReplace(
         fileContents,
-        new RegExp(/process.env[e]/g)
+        new RegExp(process.env[e], 'g')
       );
 
       if (redactionResult.matchCount > 0) {
@@ -142,7 +144,7 @@ export class Redactor {
   } {
     let matchCount = 0;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const redactedContent = fileContents.replace(regex, match => {
+    const redactedContent = fileContents.replaceAll(regex, match => {
       matchCount++;
       return this.config.full_redaction
         ? REDACTED
