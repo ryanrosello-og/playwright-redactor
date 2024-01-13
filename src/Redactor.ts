@@ -13,6 +13,7 @@ import {ICliConfig} from './model';
 import {getConfig} from './cli_prechecks';
 import {REDACTED, REDACT_FILE_EXT} from './constants';
 import {logger} from './logger';
+import {Table} from 'console-table-printer';
 
 export class Redactor {
   regexes: string[] = [];
@@ -38,12 +39,21 @@ export class Redactor {
       totalMatches: 0,
       redactions: [],
     };
-    const redactions = [];
+    const redactions: Array<Table> = [];
+    let totalMatches = 0;
     const startTime = performance.now();
     const traceFiles = this.getAllZipFiles(this.traceFolderPath);
     for (const traceFile of traceFiles) {
       const reduction = this.redactTraceFile(traceFile);
-      redactions.push(...reduction);
+      totalMatches += reduction.reduce(
+        (sum, redaction) => sum + redaction.matchCount,
+        0
+      );
+      const redactionTable = new Table({
+        title: traceFile,
+      });
+      redactionTable.addRows(reduction);
+      redactions.push(redactionTable);
     }
 
     const endTime = performance.now();
@@ -53,10 +63,7 @@ export class Redactor {
       duration: this.humanizeDuration(executionTime),
       redactions,
       totalFiles: redactions.length,
-      totalMatches: redactions.reduce(
-        (sum, redaction) => sum + redaction.matchCount,
-        0
-      ),
+      totalMatches,
     };
 
     return result;

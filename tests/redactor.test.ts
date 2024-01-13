@@ -33,19 +33,9 @@ describe('redactor', () => {
     process.env['REDACTOR_API_KEY_SECRET'] = '/img/playwright-logo.svg';
     const redactor = new Redactor(workingFolder, regexFile, configFile);
     const result = redactor.redact();
-
-    console.log('🚀 --------------------------🚀');
-    console.log('🚀 ~ test ~ result:', result);
-    console.log('🚀 --------------------------🚀');
-
-    // run redactor
-
-    // assert results
-    expect(result.totalFiles, 'TODO fix this proper').toEqual(1);
-    expect(
-      result.totalFiles,
-      'TODO ensure working folder has many trace files'
-    ).toEqual(1);
+    expect(result.totalFiles).toEqual(2);
+    expect(result.totalMatches).toEqual(82);
+    expect(result.redactions.length).toEqual(2);
 
     function setupWorkingFolder() {
       const workingFolder = path.join(
@@ -58,9 +48,14 @@ describe('redactor', () => {
       // recreate working folder and data
       try {
         fs.mkdirSync(workingFolder, {recursive: true});
+        // copy the baseline zip files twice
         copyFileSync(
           path.join(__dirname, 'test_data', 'for_redacting', 'baseline.zip'),
           path.join(workingFolder, 'baseline.zip')
+        );
+        copyFileSync(
+          path.join(__dirname, 'test_data', 'for_redacting', 'baseline.zip'),
+          path.join(workingFolder, 'baseline2.zip')
         );
       } catch (err) {
         throw new Error(err);
