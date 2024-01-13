@@ -8,8 +8,10 @@ export type Result<T> = {
   error?: string;
 };
 
-export function zip(filePath: string) {
-  // todo
+export function zip(zipFolderPath: string) {
+  const zip = new AdmZip();
+  zip.addLocalFolder(zipFolderPath);
+  zip.writeZip(`${zipFolderPath}.zip`);
 }
 
 export function getZipTargetFolder(zipFilePath: string) {
@@ -20,7 +22,17 @@ export function writeToFile(
   filePath: string,
   fileContents: string
 ): Result<string> {
-  // todo
+  try {
+    fs.writeFileSync(filePath, fileContents);
+    return {
+      success: true,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
 }
 
 export function readFile(filePath: string): Result<string> {
@@ -42,6 +54,12 @@ export function unzip(zipFilePath: string) {
   const zip = new AdmZip(zipFilePath);
   const outputFolder = getZipTargetFolder(zipFilePath);
   zip.extractAllTo(outputFolder);
+}
+
+export function deleteFile(directoryPath: fs.PathLike) {
+  if (fs.existsSync(directoryPath)) {
+    fs.unlinkSync(directoryPath);
+  }
 }
 
 export function cleanFolder(directoryPath: fs.PathLike) {

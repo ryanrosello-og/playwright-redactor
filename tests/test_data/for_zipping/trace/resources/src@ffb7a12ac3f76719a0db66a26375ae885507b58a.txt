@@ -1,0 +1,59 @@
+import { test, expect } from "@playwright/test";
+
+test.beforeAll(async () => {
+  console.log("Before tests");
+});
+
+test.afterAll(async () => {
+  console.log("After tests");
+});
+
+test("to pass does not poll", async ({ page }) => {
+  try {
+    await expect(async () => {
+      console.log(`🚀 ~ ${new Date()}`);
+      const response = await page.request.get("https://playwright.dev/");
+      expect(response.status()).toBe(222);
+
+    }).toPass({
+      intervals: [1_000, 2_000, 10_000],
+      timeout: 20_000,
+    });
+  } catch (error) {
+    console.log("🚀 ---------------------------------------------------🚀");
+    console.log("🚀 ~ file: example.spec.ts:19 ~ test ~ error:");
+    console.log("🚀 ---------------------------------------------------🚀");
+  }
+});
+
+test("has title", async ({ page }) => {
+  await page.goto("https://playwright.dev/");
+  await expect(page).toHaveTitle(/Playwright/, { timeout: 2_000 });
+
+  // Expect a title "to contain" a substring.
+  try {
+    await expect(async () => {
+      const response = await page.request.get("https://content.api.news/v3/images/bin/37636c00f9fac2011db9dca0437a0bd3");
+      expect(response.status()).toBe(201);
+    }).toPass({
+      intervals: [1_000, 2_000, 10_000],
+      timeout: 10_000,
+    });
+  } catch (error) {
+    console.log("🚀 ---------------------------------------------------🚀");
+    console.log("🚀 ~ file: example.spec.ts:19 ~ test ~ error:", error);
+    console.log("🚀 ---------------------------------------------------🚀");
+  }
+});
+
+test("get started link", async ({ page }) => {
+  await page.goto("https://playwright.dev/");
+
+  // Click the get started link.
+  await page.getByRole("link", { name: "Get started" }).click();
+
+  // Expects page to have a heading with the name of Installation.
+  await expect(
+    page.getByRole("heading", { name: "Installation" })
+  ).toBeVisible();
+});

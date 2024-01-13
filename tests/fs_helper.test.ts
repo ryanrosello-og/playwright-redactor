@@ -3,13 +3,30 @@ import path from 'path';
 import {
   Result,
   cleanFolder,
+  deleteFile,
   fileCount,
   getZipTargetFolder,
   readFile,
   unzip,
+  writeToFile,
+  zip,
 } from '../src/fs_helper';
+import {statSync} from 'fs';
 
 describe('fs_helper', () => {
+  test('writeToFile(...) write string contents of a file', async () => {
+    const fileToWrite = path.join(
+      __dirname,
+      'test_data',
+      'test_file_for_writing.txt'
+    );
+    deleteFile(fileToWrite);
+    const result: Result<string> = writeToFile(fileToWrite, 'hello world');
+    expect(result.success).toEqual(true);
+    expect(result.data).toEqual(undefined);
+    expect(result.error).toEqual(undefined);
+  });
+
   test('readFile(...) able to read contents of a file', async () => {
     const fileToRead = path.join(
       __dirname,
@@ -34,6 +51,16 @@ describe('fs_helper', () => {
     const zipFilePath = '/tmp/trace.zip';
     const targetFolder = getZipTargetFolder(zipFilePath);
     expect(targetFolder).toEqual('/tmp/trace');
+  });
+
+  test('zip(...) an entire folder', async () => {
+    const zipFolder = path.join(__dirname, 'test_data', 'for_zipping', 'trace');
+    const zipFile = `${zipFolder}.zip`;
+    deleteFile(zipFile);
+
+    zip(zipFolder);
+    expect(statSync(zipFile).isFile()).toEqual(true);
+    expect(statSync(zipFile).size).toEqual(1106997);
   });
 
   test('unzip(...) extracts contents of a trace file', async () => {
