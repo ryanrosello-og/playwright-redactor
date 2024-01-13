@@ -1,6 +1,6 @@
 import {describe, expect, test} from 'vitest';
-import doPreChecks from '../src/cli_prechecks';
 import path from 'path';
+import {doPreChecks} from '../src/cli_prechecks';
 
 const validConfigFile = path.join(__dirname, 'test_data', 'conf.json');
 
