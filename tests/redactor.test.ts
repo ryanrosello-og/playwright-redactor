@@ -1,6 +1,9 @@
 import {beforeEach, describe, expect, test} from 'vitest';
 import {Redactor} from '../src/Redactor';
 import path from 'path';
+import {cleanFolder} from '../src/fs_helper';
+// eslint-disable-next-line node/no-unsupported-features/node-builtins
+import fs, {copyFileSync} from 'fs';
 
 const traceFilesFolder = path.join(__dirname, 'test_data', 'trace_files_many');
 const regexFile = path.join(__dirname, 'test_data', 'regex_redact.txt');
@@ -10,6 +13,60 @@ let redactor: Redactor;
 describe('redactor', () => {
   beforeEach(() => {
     redactor = new Redactor(traceFilesFolder, regexFile, configFile);
+  });
+
+  test('redactor evaluates correct stats post redaction', async () => {
+    // delete working folder
+    const workingFolder = setupWorkingFolder();
+    const regexFile = path.join(
+      __dirname,
+      'test_data',
+      'for_redacting',
+      'regex_redact.txt'
+    );
+    const configFile = path.join(
+      __dirname,
+      'test_data',
+      'for_redacting',
+      'conf.json'
+    );
+    process.env['REDACTOR_API_KEY_SECRET'] = '/img/playwright-logo.svg';
+    const redactor = new Redactor(workingFolder, regexFile, configFile);
+    const result = redactor.redact();
+
+    console.log('🚀 --------------------------🚀');
+    console.log('🚀 ~ test ~ result:', result);
+    console.log('🚀 --------------------------🚀');
+
+    // run redactor
+
+    // assert results
+    expect(result.totalFiles, 'TODO fix this proper').toEqual(1);
+    expect(
+      result.totalFiles,
+      'TODO ensure working folder has many trace files'
+    ).toEqual(1);
+
+    function setupWorkingFolder() {
+      const workingFolder = path.join(
+        __dirname,
+        'test_data',
+        'for_redacting',
+        'working'
+      );
+      cleanFolder(workingFolder);
+      // recreate working folder and data
+      try {
+        fs.mkdirSync(workingFolder, {recursive: true});
+        copyFileSync(
+          path.join(__dirname, 'test_data', 'for_redacting', 'baseline.zip'),
+          path.join(workingFolder, 'baseline.zip')
+        );
+      } catch (err) {
+        throw new Error(err);
+      }
+      return workingFolder;
+    }
   });
 
   test('finds all zip files contained in a folder', async () => {
@@ -167,6 +224,11 @@ describe('redactor', () => {
     expect(result.fileContents).toEqual(
       '\n    hello world\n    oc*************es\n    example.email+123@gmail.com,\n    regex will find email above oc*************es\n    th**********************ed\n    '
     );
+  });
+
+  test('humanizeDuration(..) format processing time', async () => {
+    const result = redactor.humanizeDuration(1001);
+    expect(result).toEqual('1 second(s)');
   });
 
   test('parses regex from file into an array', async () => {

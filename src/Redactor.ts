@@ -13,6 +13,7 @@ import {ICliConfig} from './model';
 import {getConfig} from './cli_prechecks';
 import {REDACTED, REDACT_FILE_EXT} from './constants';
 import {logger} from './logger';
+
 export class Redactor {
   regexes: string[] = [];
   config: ICliConfig;
@@ -31,15 +32,32 @@ export class Redactor {
   }
 
   redact() {
-    const result = {
+    let result = {
+      duration: '',
       totalFiles: 0,
-      totalFilesRedacted: 0,
+      totalMatches: 0,
       redactions: [],
     };
+    const redactions = [];
+    const startTime = performance.now();
     const traceFiles = this.getAllZipFiles(this.traceFolderPath);
     for (const traceFile of traceFiles) {
-      result.redactions.concat(this.redactTraceFile(traceFile));
+      const reduction = this.redactTraceFile(traceFile);
+      redactions.push(...reduction);
     }
+
+    const endTime = performance.now();
+    const executionTime = endTime - startTime;
+    result = {
+      ...result,
+      duration: this.humanizeDuration(executionTime),
+      redactions,
+      totalFiles: redactions.length,
+      totalMatches: redactions.reduce(
+        (sum, redaction) => sum + redaction.matchCount,
+        0
+      ),
+    };
 
     return result;
   }
@@ -62,7 +80,7 @@ export class Redactor {
         // Apply regexes from the regex file first
         const regexResult = this.applyRegex(file, readFileResult.data);
         if (regexResult.replacements.length > 0) {
-          regexResult.replacements.length > 0 ?? result.push({...regexResult});
+          result.push(...regexResult.replacements);
           writeToFile(file, regexResult.fileContents);
         }
 
@@ -72,8 +90,7 @@ export class Redactor {
           regexResult.fileContents
         );
         if (regexEnvsResult.replacements.length > 0) {
-          regexEnvsResult.replacements.length > 0 ??
-            result.push({...regexEnvsResult});
+          result.push(...regexEnvsResult.replacements);
           writeToFile(file, regexEnvsResult.fileContents);
         }
       } else {
@@ -186,5 +203,21 @@ export class Redactor {
     });
 
     return zipFiles;
+  }
+
+  humanizeDuration(milliseconds: number) {
+    if (milliseconds < 1000) return `${Math.floor(milliseconds)} ms`;
+
+    const seconds = Math.floor((milliseconds / 1000) % 60);
+    const minutes = Math.floor((milliseconds / (1000 * 60)) % 60);
+
+    const humanized = [
+      minutes > 0 ? `${minutes} minute(s)` : '',
+      seconds > 0 ? `${seconds} second(s)` : '',
+    ]
+      .filter(str => str)
+      .join(', ');
+
+    return humanized;
   }
 }

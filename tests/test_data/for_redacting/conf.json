@@ -1,0 +1,7 @@
+{
+  "full_redaction": true,
+  "log_level": "info",
+  "environment_variables": [
+    "REDACTOR_API_KEY_SECRET"
+  ]
+}
