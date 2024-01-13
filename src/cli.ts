@@ -2,6 +2,7 @@ import {Command} from 'commander';
 import {ICliConfig} from './model';
 import {doPreChecks} from './cli_prechecks';
 import {logger} from './logger';
+import {Redactor} from './Redactor';
 
 const program = new Command();
 const name = 'playwright-redactor';
@@ -34,8 +35,24 @@ program
     if (preCheckResult.status === 'error') {
       throw new Error(`❌ ${preCheckResult.message}`);
     }
-    // Do stuff
-    logger.debug(config);
+    const redactor = new Redactor(options.traceFile, options.regexes, config);
+    const result = redactor.redact();
+    if (result.totalMatches === 0) {
+      logger.info(
+        `✅ Redactor completed - no redactions were made [${result.duration}]`
+      );
+      return;
+    }
+    for (const table of result.redactions) {
+      table.printTable();
+      console.log('\n'); // leave a gap between each table
+    }
+    logger.info(
+      `✅ Redactor completed [${result.duration}]
+      Total files: ${result.totalFiles}
+      Total matches: ${result.totalMatches}
+      `
+    );
   });
 
 program.parse();
