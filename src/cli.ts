@@ -1,13 +1,7 @@
 import {Command} from 'commander';
-import winston from 'winston';
-import doPreChecks from './cli_prechecks';
 import {ICliConfig} from './model';
-
-const logger = winston.createLogger({
-  level: 'debug',
-  format: winston.format.json(),
-  transports: [new winston.transports.Console()],
-});
+import {doPreChecks} from './cli_prechecks';
+import {logger} from './logger';
 
 const program = new Command();
 const name = 'playwright-redactor';

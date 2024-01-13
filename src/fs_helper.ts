@@ -50,6 +50,28 @@ export function readFile(filePath: string): Result<string> {
   }
 }
 
+export function findFilesInDirectory(
+  dirPath: fs.PathLike,
+  extensions: string | string[]
+) {
+  let result = [];
+  const files = fs.readdirSync(dirPath);
+
+  files.forEach(file => {
+    const filePath = path.join(String(dirPath), file);
+
+    if (fs.statSync(filePath).isDirectory()) {
+      result = result.concat(findFilesInDirectory(filePath, extensions));
+    } else {
+      if (extensions.includes(path.extname(file))) {
+        result.push(filePath);
+      }
+    }
+  });
+
+  return result;
+}
+
 export function unzip(zipFilePath: string) {
   const zip = new AdmZip(zipFilePath);
   const outputFolder = getZipTargetFolder(zipFilePath);

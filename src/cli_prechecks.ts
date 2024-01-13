@@ -93,8 +93,7 @@ function fileExists(filePath: string): boolean {
   return existsSync(absolutePath);
 }
 
-function getConfig(configPath: string): ICliConfig {
+export function getConfig(configPath: string): ICliConfig {
   const config = readFileSync(path.resolve(path.resolve(configPath)), 'utf-8');
   return JSON.parse(config);
 }
-export default doPreChecks;

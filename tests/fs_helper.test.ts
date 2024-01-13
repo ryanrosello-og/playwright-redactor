@@ -5,6 +5,7 @@ import {
   cleanFolder,
   deleteFile,
   fileCount,
+  findFilesInDirectory,
   getZipTargetFolder,
   readFile,
   unzip,
@@ -14,6 +15,16 @@ import {
 import {statSync} from 'fs';
 
 describe('fs_helper', () => {
+  test('findFilesInDirectory(...) return array of in scope files for replacement', async () => {
+    const dirPath = path.join(__dirname, 'test_data', 'for_zipping', 'trace');
+    const result = findFilesInDirectory(dirPath, [
+      '.trace',
+      '.stacks',
+      '.network',
+    ]);
+    expect(result.length).toEqual(4);
+  });
+
   test('writeToFile(...) write string contents of a file', async () => {
     const fileToWrite = path.join(
       __dirname,

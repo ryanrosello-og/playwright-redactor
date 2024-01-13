@@ -1,64 +1,171 @@
 import fs from 'fs';
 import path from 'path';
-import AdmZip from 'adm-zip';
-import {getZipTargetFolder, unzip, zip} from './fs_helper';
+import {
+  cleanFolder,
+  findFilesInDirectory,
+  getZipTargetFolder,
+  readFile,
+  unzip,
+  writeToFile,
+  zip,
+} from './fs_helper';
+import {ICliConfig} from './model';
+import {getConfig} from './cli_prechecks';
+import {REDACTED, REDACT_FILE_EXT} from './constants';
+import {logger} from './logger';
 export class Redactor {
   regexes: string[] = [];
+  config: ICliConfig;
   constructor(
     private traceFolderPath: string,
-    private regexFile: string
+    private regexFile: string,
+    private conf: string | ICliConfig
   ) {
     const data = fs.readFileSync(this.regexFile, 'utf8');
     this.regexes = data.split('\n');
+    if (typeof this.conf === 'string') {
+      this.config = getConfig(this.conf);
+    } else {
+      this.config = this.conf;
+    }
   }
 
-  redact(): string {
+  redact() {
     const result = {
       totalFiles: 0,
       totalFilesRedacted: 0,
       redactions: [],
     };
-
-    console.log('🚀 ---------------------------------------🚀');
-    console.log('🚀 ~ Redactor ~ redact ~ result:', result);
-    console.log('🚀 ---------------------------------------🚀');
-
-    // for each trace file in the folder:
-    //   unzip to a temp folder
-    //     for each file in the temp folder:
-    //       for each regex in the regex file: (or munge all regex into single regex)
-    //         if full_redact or partial_redact:
-    //            do regex replace on the file
-    //       for each env var in the environment_variables array
-    //         if full_redact or partial_redact:
-    //            do regex replace on the file
-    //       save the file
-    //   re-zip the file using original name
-    //   delete the temp folder
-    //   update the stats
     const traceFiles = this.getAllZipFiles(this.traceFolderPath);
+    for (const traceFile of traceFiles) {
+      result.redactions.concat(this.redactTraceFile(traceFile));
+    }
 
-    console.log('🚀 -----------------------------------------------🚀');
-    console.log('🚀 ~ Redactor ~ redact ~ traceFiles:', traceFiles);
-    console.log('🚀 -----------------------------------------------🚀');
-
-    return 'todo';
+    return result;
   }
 
-  redactFile(zipFilePath: string) {
-    unzip(zipFilePath);
-    this.applyRegexes(zipFilePath);
-    zip(zipFilePath);
-    // remove the unzip folder
+  redactTraceFile(traceFile: string) {
+    unzip(traceFile);
+    const zipFolder = getZipTargetFolder(traceFile);
+    const replacements = this.applyRegexes(zipFolder);
+    zip(zipFolder);
+    cleanFolder(zipFolder);
+    return replacements;
   }
 
-  applyRegexes(zipFilePath: string) {
-    const outputFolder = getZipTargetFolder(zipFilePath);
-    // filter for only .trace .stacs .network files
-    // for each file in the folder (filtered)
-    //  for each regex in the regex file: (or munge all regex into single regex)
-    //    if full_redact or partial_redact: .....
-    throw new Error('Function not implemented.');
+  applyRegexes(zipFolder: string) {
+    const filesForRedaction = findFilesInDirectory(zipFolder, REDACT_FILE_EXT);
+    const result = [];
+    for (const file of filesForRedaction) {
+      const readFileResult = readFile(file);
+      if (readFileResult.success) {
+        // Apply regexes from the regex file first
+        const regexResult = this.applyRegex(file, readFileResult.data);
+        if (regexResult.replacements.length > 0) {
+          regexResult.replacements.length > 0 ?? result.push({...regexResult});
+          writeToFile(file, regexResult.fileContents);
+        }
+
+        // Using the modified outcome from above, apply the env var regexes
+        const regexEnvsResult = this.applyEnvVarRegex(
+          file,
+          regexResult.fileContents
+        );
+        if (regexEnvsResult.replacements.length > 0) {
+          regexEnvsResult.replacements.length > 0 ??
+            result.push({...regexEnvsResult});
+          writeToFile(file, regexEnvsResult.fileContents);
+        }
+      } else {
+        logger.warn(
+          `Unable to read file ${file}, skipping.  Error: [${readFileResult?.error}]`
+        );
+      }
+    }
+    return result;
+  }
+
+  applyRegex(file: string, fileContents: string) {
+    const replacements = [];
+    for (const regex of this.regexes) {
+      const redactionResult = this.doRegexReplace(
+        fileContents,
+        new RegExp(regex)
+      );
+
+      if (redactionResult.matchCount > 0) {
+        replacements.push({
+          file,
+          regex,
+          matchCount: redactionResult.matchCount,
+        });
+      }
+
+      fileContents = redactionResult.redactedContent;
+    }
+    return {
+      replacements,
+      fileContents,
+    };
+  }
+
+  applyEnvVarRegex(file: string, fileContents: string) {
+    const replacements = [];
+    for (const e of this.config.environment_variables) {
+      const redactionResult = this.doRegexReplace(
+        fileContents,
+        new RegExp(/process.env[e]/g)
+      );
+
+      if (redactionResult.matchCount > 0) {
+        replacements.push({
+          file,
+          regex: e,
+          matchCount: redactionResult.matchCount,
+        });
+      }
+
+      fileContents = redactionResult.redactedContent;
+    }
+    return {
+      replacements,
+      fileContents,
+    };
+  }
+
+  doRegexReplace(
+    fileContents: string,
+    regex: RegExp
+  ): {
+    redactedContent: string;
+    matchCount: number;
+  } {
+    let matchCount = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const redactedContent = fileContents.replace(regex, match => {
+      matchCount++;
+      return this.config.full_redaction
+        ? REDACTED
+        : this.applyPartialRedaction(match);
+    });
+
+    return {redactedContent, matchCount};
+  }
+
+  applyPartialRedaction(input: string) {
+    const startLength = 2;
+    const endLength = 2;
+    const maskCharacter = '*';
+
+    if (input.length <= startLength + endLength) {
+      return input;
+    }
+
+    const start = input.substring(0, startLength);
+    const end = input.substring(input.length - endLength);
+    const masked = maskCharacter.repeat(input.length - startLength - endLength);
+
+    return start + masked + end;
   }
 
   getAllZipFiles(dirPath: string, zipFiles?: string[]): string[] {
