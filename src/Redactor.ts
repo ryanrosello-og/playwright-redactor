@@ -158,7 +158,7 @@ export class Redactor {
     const maskCharacter = '*';
 
     if (input.length <= startLength + endLength) {
-      return input;
+      return '****';
     }
 
     const start = input.substring(0, startLength);
