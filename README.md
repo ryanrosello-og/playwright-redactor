@@ -18,7 +18,7 @@ This is a tool that can be used to redact sensitive information from the Playwri
 Ideally, you would invoke this app as part of your CI/CD pipeline as soon as Playwright has finished generated the trace files using the following command.
 
 ```bash
-npx playwright-redactor -c ./config.json -t ./traces
+npx playwright-redactor -c ./config.json -t ./traces -r ./regexes.txt
 ```
 
 The command above will redact the sensitive information from the trace files in the `./traces` folder using the configuration in the `./config.json` file.
@@ -27,7 +27,7 @@ The command above will redact the sensitive information from the trace files in 
 
 | Options  |          |
 | -------- | -------- |
-| `-v, --version`   | Display version number   |
+| `-r, --regexes <path>`   | Path to the text file containing the regular expression used for replacement.  Each regex separated by a new line   |
 |`-c, --config <path>`   | Path to config file  |
 |`-t, --trace-files <path>`   | Folder path containing the trace files that require scrubbing  |
 

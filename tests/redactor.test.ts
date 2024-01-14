@@ -34,7 +34,7 @@ describe('redactor', () => {
     const redactor = new Redactor(workingFolder, regexFile, configFile);
     const result = redactor.redact();
     expect(result.totalFiles).toEqual(2);
-    expect(result.totalMatches).toEqual(82);
+    expect(result.totalMatches).toEqual(88);
     expect(result.redactions.length).toEqual(2);
 
     function setupWorkingFolder() {

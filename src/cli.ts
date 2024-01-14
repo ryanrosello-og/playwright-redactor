@@ -35,7 +35,7 @@ program
     if (preCheckResult.status === 'error') {
       throw new Error(`❌ ${preCheckResult.message}`);
     }
-    const redactor = new Redactor(options.traceFile, options.regexes, config);
+    const redactor = new Redactor(options.traceFiles, options.regexes, config);
     const result = redactor.redact();
     if (result.totalMatches === 0) {
       logger.info(
