@@ -9,6 +9,9 @@ This is a tool that can be used to redact sensitive information from your Playwr
 ![Gif](https://github.com/ryanrosello-og/playwright-redactor/blob/main/assets/2024-01-14_18-35-20.gif?raw=true)
 
 
+![Normal vs Redacted](https://github.com/ryanrosello-og/playwright-redactor/blob/main/assets/2024-01-14_18-54-40.png?raw=true)
+
+
 
 ### 🧪 Oddly specific use case
 
