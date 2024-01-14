@@ -1,6 +1,7 @@
-import {describe, expect, test} from 'vitest';
+import {beforeAll, describe, expect, test} from 'vitest';
 import path from 'path';
 import {doPreChecks} from '../src/cli_prechecks';
+import fs from 'fs';
 
 const validConfigFile = path.join(__dirname, 'test_data', 'conf.json');
 const inValidConfigFile = path.join(
@@ -15,6 +16,12 @@ const validTraceFilesFolder = path.join(
   'for_redacting',
   'working'
 );
+
+beforeAll(async () => {
+  if (!fs.existsSync(validTraceFilesFolder)) {
+    fs.mkdirSync(validTraceFilesFolder, {recursive: true});
+  }
+});
 
 describe('CLI app - pre-check', () => {
   test('throws an error when the config file does not exist', async () => {
