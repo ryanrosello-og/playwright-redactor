@@ -9,8 +9,6 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-      - name: Clean Workspace
-        uses: AutoModality/action-clean@v1.1.0
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
@@ -29,10 +27,6 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-      # - uses: romeovs/lcov-reporter-action@v0.2.16
-      #   with:
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     lcov-file: ./coverage/lcov.info
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
