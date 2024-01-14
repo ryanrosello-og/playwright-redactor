@@ -3,15 +3,10 @@
 [![Coverage Status](https://coveralls.io/repos/github/ryanrosello-og/playwright-redactor/badge.svg?branch=add-gh-workflow)](https://coveralls.io/github/ryanrosello-og/playwright-redactor?branch=add-gh-workflow) [![vitests](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml/badge.svg)](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml)
 
 
-![Main Logo](https://github.com/ryanrosello-og/playwright-redactor/blob/main/assets/2024-01-14_18-40-53.png?raw=true)
 
 This is a tool that can be used to redact sensitive information from your Playwright trace files.
 
-![Gif](https://github.com/ryanrosello-og/playwright-redactor/blob/main/assets/2024-01-14_18-35-20.gif?raw=true)
-
-
-![Normal vs Redacted](https://github.com/ryanrosello-og/playwright-redactor/blob/main/assets/2024-01-14_18-54-40.png?raw=true)
-
+![Main Logo](https://github.com/ryanrosello-og/playwright-redactor/blob/main/assets/2024-01-15_06-11-43.png?raw=true)
 
 
 ### 🧪 Oddly specific use case
