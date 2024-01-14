@@ -132,3 +132,4 @@ build/
 tests/test_data/trace_files_single/trace/
 tests/test_data/for_zipping/trace.zip
 tests/test_data/for_redacting/working/
+tests/test_data/cli/working/
