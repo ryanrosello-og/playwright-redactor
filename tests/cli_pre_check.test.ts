@@ -27,6 +27,18 @@ describe('CLI app - pre-check', () => {
     expect(result.message).toContain('Config file does not exist');
   });
 
+  test('throws an error when the regexes file does not exist', async () => {
+    const result = await doPreChecks(
+      '/this/file/does/not/exist.txt',
+      validTraceFilesFolder,
+      validConfigFile
+    );
+    expect(result.status).toEqual('error');
+    expect(result.message).toContain(
+      'The text file containing the regexes does not exist: C:\\_repo\\playwright-redactor\\tests\\test_data\\for_redacting\\working:\n      Use --regexes <path> e.g. --regexes="./regex_redact.txt"'
+    );
+  });
+
   test('throws an error when the trace folder does not exist', async () => {
     const result = await doPreChecks(
       validRegexFile,
@@ -47,7 +59,7 @@ describe('CLI app - pre-check', () => {
     );
     expect(result.status).toEqual('error');
     expect(result.message).toContain(
-      'Config file is not valid: [\n  {\n    "code": "invalid_type",\n    "expected": "boolean",\n    "received": "string",\n    "path": [\n      "full_redaction"\n    ],\n    "message": "Expected boolean, received string"\n  }\n]'
+      'Config file is not valid: {\n  "issues": [\n    {\n      "code": "invalid_type",\n      "expected": "boolean",\n      "received": "string",\n      "path": [\n        "full_redaction"\n      ],\n      "message": "Expected boolean, received string"\n    }\n  ],\n  "name": "ZodError"\n}'
     );
   });
 

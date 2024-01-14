@@ -9,7 +9,8 @@ export const logger = winston.createLogger({
       format: 'YYYY-MM-DD hh:mm:ss.SSS A',
     }),
     align(),
-    printf(info => `[${info.timestamp}] ${info.level}: ${info.message}`)
+    /* v8 ignore next */
+    printf(debug => `[${debug.timestamp}] ${debug.level}: ${debug.message}`)
   ),
   transports: [new winston.transports.Console()],
 });

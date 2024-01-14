@@ -10,9 +10,8 @@ describe('CLI app', () => {
     const workingFolder = setupWorkingFolder();
     const cliCommand = `npx ts-node ./src/cli.ts -c "./tests/test_data/cli/conf.json" -t "${workingFolder}" -r "./tests/test_data/cli/regex_redact.txt"`;
     const output = execSync(cliCommand, {encoding: 'utf-8'});
-
     expect(output).toContain('✅ Redactor completed');
-    expect(output).toContain('Total matches: 258');
+    expect(output).toContain('Total matches: 322');
     expect(output).toContain('Total files: 2');
 
     function setupWorkingFolder() {

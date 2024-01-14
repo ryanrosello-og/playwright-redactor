@@ -13,6 +13,7 @@ import {
   zip,
 } from '../src/fs_helper';
 import {statSync} from 'fs';
+import {fileExists} from '../src/cli_prechecks';
 
 describe('fs_helper', () => {
   test('findFilesInDirectory(...) return array of in scope files for replacement', async () => {
@@ -38,6 +39,18 @@ describe('fs_helper', () => {
     expect(result.error).toEqual(undefined);
   });
 
+  test('writeToFile(...) returns an error when writing to file does not succeed', async () => {
+    const result: Result<string> = writeToFile(
+      '/this/file/is/fake.txt',
+      'hello world'
+    );
+    expect(result.success).toEqual(false);
+    expect(result.data).toEqual(undefined);
+    expect(result.error).toEqual(
+      "ENOENT: no such file or directory, open '/this/file/is/fake.txt'"
+    );
+  });
+
   test('readFile(...) able to read contents of a file', async () => {
     const fileToRead = path.join(
       __dirname,
@@ -49,6 +62,11 @@ describe('fs_helper', () => {
     expect(result.data).toEqual(
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
     );
+  });
+
+  test('fileExists(...) returns false when no path is supplied', async () => {
+    const result = fileExists(undefined);
+    expect(result).toEqual(false);
   });
 
   test('readFile(...) should fail when attempting to read non-existent file', async () => {

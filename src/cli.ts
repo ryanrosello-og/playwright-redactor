@@ -1,3 +1,5 @@
+/* v8 ignore start */
+// tests covered in tests\cli.test.ts
 import {Command} from 'commander';
 import {ICliConfig} from './model';
 import {doPreChecks} from './cli_prechecks';
@@ -56,3 +58,4 @@ program
   });
 
 program.parse();
+/* v8 ignore stop */

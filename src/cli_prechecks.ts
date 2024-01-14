@@ -51,16 +51,18 @@ export const doPreChecks = async (
   if (!parseResult.success) {
     return {
       status: 'error',
-      message: `Config file is not valid: ${
-        parseResult.error.message ?? JSON.stringify(parseResult.error, null, 2)
-      }`,
+      message: `Config file is not valid: ${JSON.stringify(
+        parseResult.error,
+        null,
+        2
+      )}`,
     };
   }
 
   // iterate through each environment_variable and print warning
   // if its undefined
   let allEnvironmentVariablesDefined = true;
-  for (const e of config.environment_variables ?? []) {
+  for (const e of config.environment_variables) {
     if (process.env[e] === undefined) {
       console.warn(
         `WARNING: Environment variable ${e} is not defined in your shell.`
@@ -78,7 +80,7 @@ export const doPreChecks = async (
   };
 };
 
-function fileExists(filePath: string): boolean {
+export function fileExists(filePath: string): boolean {
   let absolutePath: PathLike;
   try {
     absolutePath = path.resolve(filePath);
