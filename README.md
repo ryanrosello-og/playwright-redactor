@@ -1,6 +1,6 @@
 # playwright-redactor
 
-[![Coverage Status](https://coveralls.io/repos/github/ryanrosello-og/playwright-redactor/badge.svg?branch=add-gh-workflow)](https://coveralls.io/github/ryanrosello-og/playwright-redactor?branch=add-gh-workflow) [![vitests](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml/badge.svg)](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml)
+[![Coverage Status](https://coveralls.io/repos/github/ryanrosello-og/playwright-redactor/badge.svg?branch=add-gh-workflow)](https://coveralls.io/github/ryanrosello-og/playwright-redactor?branch=add-gh-workflow) [![vitests](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml/badge.svg)](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml) [![CodeQL](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/codeql.yml/badge.svg)](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/codeql.yml)
 
 
 
