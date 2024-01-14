@@ -1,4 +1,4 @@
-import {existsSync, PathLike, readFileSync, statSync} from 'fs';
+import {existsSync, PathLike, readFileSync} from 'fs';
 import path from 'path';
 import {ICliConfig, ZodCliSchema} from './model';
 
@@ -12,6 +12,7 @@ export const doPreChecks = async (
   traceFilesFolderPath?: string;
   configPath?: string;
   config?: ICliConfig;
+  allEnvironmentVariablesDefined?: boolean;
 }> => {
   if (!fileExists(traceFilesFolderPath)) {
     return {
@@ -56,22 +57,15 @@ export const doPreChecks = async (
     };
   }
 
-  // ensure the regexes files is not empty
-  if (statSync(config.regexes).size === 0) {
-    return {
-      status: 'error',
-      message:
-        'The regex file is empty. Please add some regexes to the file and try again.',
-    };
-  }
-
   // iterate through each environment_variable and print warning
   // if its undefined
+  let allEnvironmentVariablesDefined = true;
   for (const e of config.environment_variables ?? []) {
     if (process.env[e] === undefined) {
       console.warn(
         `WARNING: Environment variable ${e} is not defined in your shell.`
       );
+      allEnvironmentVariablesDefined = false;
     }
   }
 
@@ -80,6 +74,7 @@ export const doPreChecks = async (
     traceFilesFolderPath: path.resolve(traceFilesFolderPath),
     configPath: path.resolve(configFile),
     config: parseResult.data,
+    allEnvironmentVariablesDefined,
   };
 };
 

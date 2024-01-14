@@ -73,7 +73,6 @@ describe('redactor', () => {
     const redactor = new Redactor(traceFilesFolder, regexFile, {
       full_redaction: false,
       log_level: 'info',
-      regexes: '',
       environment_variables: [],
     });
     const result = redactor.applyPartialRedaction('hello world');
@@ -84,7 +83,6 @@ describe('redactor', () => {
     const redactor = new Redactor(traceFilesFolder, regexFile, {
       full_redaction: false,
       log_level: 'info',
-      regexes: '',
       environment_variables: [],
     });
     const result = redactor.applyPartialRedaction('test');
@@ -159,7 +157,6 @@ describe('redactor', () => {
     const redactor = new Redactor(traceFilesFolder, regexFile, {
       full_redaction: false,
       log_level: 'info',
-      regexes: '',
       environment_variables: ['SUPER_SECRET_ENV'],
     });
     const fileContents = `
@@ -188,7 +185,6 @@ describe('redactor', () => {
     const redactor = new Redactor(traceFilesFolder, regexFile, {
       full_redaction: false,
       log_level: 'info',
-      regexes: '',
       environment_variables: ['SUPER_SECRET_ENV', 'GOOGLE_API_KEY'],
     });
     process.env['SUPER_SECRET_ENV'] = 'this text will be replaced';
