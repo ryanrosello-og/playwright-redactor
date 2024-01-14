@@ -27,10 +27,10 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-      - uses: romeovs/lcov-reporter-action@v0.2.16
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: ./coverage/lcov.info
+      # - uses: romeovs/lcov-reporter-action@v0.2.16
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     lcov-file: ./coverage/lcov.info
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
