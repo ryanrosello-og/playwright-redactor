@@ -1,8 +1,8 @@
 # playwright-redactor
-
+🤐
 **[ALl of the badges here]**
 
-This is a tool that can be used to redact sensitive information from the Playwright trace files. It can be used to redact sensitive information from the trace files before storing and sharing them with strangers.
+This is a tool that can be used to redact sensitive information from your Playwright trace files.
 
 **[Insert without/with redaction screenshot here]**
 
