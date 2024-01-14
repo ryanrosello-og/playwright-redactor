@@ -4,7 +4,7 @@
 
 
 
-This is a tool that can be used to redact sensitive information from your Playwright trace files.
+## This is a tool that can be used to redact sensitive information from your Playwright trace files.
 
 ![Main Logo](https://github.com/ryanrosello-og/playwright-redactor/blob/main/assets/2024-01-15_06-11-43.png?raw=true)
 
