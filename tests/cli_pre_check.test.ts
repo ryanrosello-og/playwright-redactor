@@ -35,7 +35,7 @@ describe('CLI app - pre-check', () => {
     );
     expect(result.status).toEqual('error');
     expect(result.message).toContain(
-      'The text file containing the regexes does not exist: C:\\_repo\\playwright-redactor\\tests\\test_data\\for_redacting\\working:\n      Use --regexes <path> e.g. --regexes="./regex_redact.txt"'
+      'The text file containing the regexes does not exist:'
     );
   });
 
