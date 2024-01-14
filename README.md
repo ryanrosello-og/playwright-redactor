@@ -1,6 +1,6 @@
 # playwright-redactor
 
-[![Coverage Status](https://coveralls.io/repos/github/ryanrosello-og/playwright-redactor/badge.svg?branch=add-gh-workflow)](https://coveralls.io/github/ryanrosello-og/playwright-redactor?branch=add-gh-workflow)[![vitests](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml/badge.svg)](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml)
+[![Coverage Status](https://coveralls.io/repos/github/ryanrosello-og/playwright-redactor/badge.svg?branch=add-gh-workflow)](https://coveralls.io/github/ryanrosello-og/playwright-redactor?branch=add-gh-workflow) [![vitests](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml/badge.svg)](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml)
 
 
 ![Main Logo](https://github.com/ryanrosello-og/playwright-redactor/blob/main/assets/2024-01-14_18-40-53.png?raw=true)
@@ -23,13 +23,13 @@ This is a tool that can be used to redact sensitive information from your Playwr
 
 ## 📦 Usage
 
-Ideally, you would invoke this app as part of your CI/CD pipeline as soon as Playwright has finished generated the trace files using the following command.
+Ideally, you would invoke this app as part of your CI/CD pipeline as soon as Playwright has finished generating the trace files using the following command.
 
 ```bash
 npx playwright-redactor -c ./config.json -t ./traces -r ./regexes.txt
 ```
 
-The command above will redact the sensitive information from the trace files in the `./traces` folder using the configuration in the `./config.json` file.
+The command above will redact the sensitive information from the trace files in the `./traces` folder using the configuration in the `./config.json` file.  The regexes used for redaction are defined in the `./regexes.txt` file.
 
 ## ⚙️ Command line options
 
