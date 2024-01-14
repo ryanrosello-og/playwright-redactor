@@ -137,10 +137,10 @@ export class Redactor {
     const replacements = [];
     for (const e of this.config.environment_variables) {
       if (!process.env[e]) continue;
-
+      const envVarEscaped = this.escapeRegExp(process.env[e]);
       const redactionResult = this.doRegexReplace(
         fileContents,
-        new RegExp(process.env[e], 'g')
+        new RegExp(envVarEscaped, 'g')
       );
 
       if (redactionResult.matchCount > 0) {
@@ -157,6 +157,10 @@ export class Redactor {
       replacements,
       fileContents,
     };
+  }
+
+  escapeRegExp(str: string) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   doRegexReplace(

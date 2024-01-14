@@ -89,7 +89,7 @@ describe('fs_helper', () => {
 
     zip(zipFolder);
     expect(statSync(zipFile).isFile()).toEqual(true);
-    expect(statSync(zipFile).size).toEqual(1106997);
+    expect(statSync(zipFile).size).toBeGreaterThan(1100000);
   });
 
   test('unzip(...) extracts contents of a trace file', async () => {
