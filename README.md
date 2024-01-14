@@ -1,6 +1,7 @@
 # playwright-redactor
 
-**[ALl of the badges here]**
+[![Coverage Status](https://coveralls.io/repos/github/ryanrosello-og/playwright-redactor/badge.svg?branch=add-gh-workflow)](https://coveralls.io/github/ryanrosello-og/playwright-redactor?branch=add-gh-workflow)[![vitests](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml/badge.svg)](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml)
+
 
 ![Main Logo](https://github.com/ryanrosello-og/playwright-redactor/blob/main/assets/2024-01-14_18-40-53.png?raw=true)
 
