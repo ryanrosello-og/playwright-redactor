@@ -1,6 +1,6 @@
 {
   "name": "playwright-redactor",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "Remove sensitive data from your Playwright trace files",
   "author": {
     "name": "Ryan Rosello"
