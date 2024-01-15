@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* v8 ignore start */
 // tests covered in tests\cli.test.ts
 import {Command} from 'commander';
