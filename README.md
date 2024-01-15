@@ -26,6 +26,8 @@ npx playwright-redactor -c ./config.json -t ./traces -r ./regexes.txt
 
 The command above will redact the sensitive information from the trace files in the `./traces` folder using the configuration in the `./config.json` file.  The regexes used for redaction are defined in the `./regexes.txt` file.
 
+![Usage](https://github.com/ryanrosello-og/playwright-redactor/blob/main/assets/2024-01-15_17-54-59.gif?raw=true)
+
 ## ⚙️ Command line options
 
 | Options  |          |
