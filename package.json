@@ -1,11 +1,11 @@
 {
   "name": "playwright-redactor",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "Remove sensitive data from your Playwright trace files",
   "author": {
     "name": "Ryan Rosello"
   },
-  "repository": "https://github.com/ryanrosello-og/playwright-redactor",
+  "repository": "git@github.com:ryanrosello-og/playwright-redactor.git",
   "main": "build/src/cli.js",
   "files": [
     "build/src"
