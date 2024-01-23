@@ -87,9 +87,7 @@ export class Redactor {
         // Apply regexes from the regex file first
         const regexResult = this.applyRegex(
           file,
-          file.endsWith('.dat')
-            ? decodeURIComponent(readFileResult.data)
-            : readFileResult.data
+          this.decodeContent(file, readFileResult.data)
         );
         if (regexResult.replacements.length > 0) {
           result.push(...regexResult.replacements);
@@ -99,9 +97,7 @@ export class Redactor {
         // Using the modified outcome from above, apply the env var regexes
         const regexEnvsResult = this.applyEnvVarRegex(
           file,
-          file.endsWith('.dat')
-            ? decodeURIComponent(regexResult.fileContents)
-            : regexResult.fileContents
+          this.decodeContent(file, regexResult.fileContents)
         );
         if (regexEnvsResult.replacements.length > 0) {
           result.push(...regexEnvsResult.replacements);
@@ -114,6 +110,12 @@ export class Redactor {
       }
     }
     return result;
+  }
+
+  decodeContent(file: string, fileContents: string) {
+    return file.endsWith('.dat')
+      ? decodeURIComponent(fileContents)
+      : fileContents;
   }
 
   applyRegex(file: string, fileContents: string) {
@@ -144,18 +146,18 @@ export class Redactor {
     const replacements = [];
     for (const e of this.config.environment_variables) {
       if (!process.env[e]) continue;
-      const envVarEscaped = String(process.env[e]);
+      const envVarEscaped = this.escapeRegExp(process.env[e]);
+      const redactionText = this.applyRedaction(envVarEscaped);
       const redactionResult = fileContents.replaceAll(
         envVarEscaped,
-        this.config.full_redaction
-          ? REDACTED
-          : this.applyPartialRedaction(envVarEscaped)
+        redactionText
       );
+      const matchCount = this.getRedactionCount(redactionResult, redactionText);
       if (redactionResult !== fileContents) {
         replacements.push({
           file,
           regex: e,
-          matchCount: 1,
+          matchCount,
         });
       }
 
@@ -167,8 +169,13 @@ export class Redactor {
     };
   }
 
-  escapeRegExp(str: string) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  getRedactionCount(fileContents: string, redaction: string): number {
+    const array = fileContents.split(redaction);
+    return array.length - 1;
+  }
+
+  escapeRegExp(str: unknown) {
+    return String(str);
   }
 
   doRegexReplace(
@@ -182,15 +189,17 @@ export class Redactor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const redactedContent = fileContents.replaceAll(regex, match => {
       matchCount++;
-      return this.config.full_redaction
-        ? REDACTED
-        : this.applyPartialRedaction(match);
+      return this.applyRedaction(match);
     });
 
     return {redactedContent, matchCount};
   }
 
-  applyPartialRedaction(input: string) {
+  applyRedaction(input: string) {
+    if (this.config.full_redaction) {
+      return REDACTED;
+    }
+
     const startLength = 2;
     const endLength = 2;
     const maskCharacter = '*';
