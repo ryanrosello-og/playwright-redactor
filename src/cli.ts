@@ -39,7 +39,7 @@ program
       throw new Error(`❌ ${preCheckResult.message}`);
     }
     const redactor = new Redactor(options.traceFiles, options.regexes, config);
-    const result = redactor.redact();
+    const result = await redactor.redact();
     if (result.totalMatches === 0) {
       logger.info(
         `✅ Redactor completed - no redactions were made [${result.duration}]`

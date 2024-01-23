@@ -32,7 +32,7 @@ describe('redactor', () => {
     );
     process.env['REDACTOR_API_KEY_SECRET'] = '/img/playwright-logo.svg';
     const redactor = new Redactor(workingFolder, regexFile, configFile);
-    const result = redactor.redact();
+    const result = await redactor.redact();
     expect(result.totalFiles).toEqual(2);
     expect(result.totalMatches).toEqual(156);
     expect(result.redactions.length).toEqual(2);
