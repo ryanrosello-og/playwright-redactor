@@ -39,7 +39,7 @@ program
       throw new Error(`❌ ${preCheckResult.message}`);
     }
     const redactor = new Redactor(options.traceFiles, options.regexes, config);
-    const result = redactor.redact();
+    const result = await redactor.redact();
     if (result.totalMatches === 0) {
       logger.info(
         `✅ Redactor completed - no redactions were made [${result.duration}]`
@@ -47,8 +47,14 @@ program
       return;
     }
     for (const table of result.redactions) {
-      table.printTable();
-      console.log('\n'); // leave a gap between each table
+      try {
+        if (table.table.rows.length > 0) {
+          table.printTable();
+          console.log('\n'); // leave a gap between each table
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
     logger.info(
       `✅ Redactor completed [${result.duration}]

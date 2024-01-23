@@ -32,9 +32,9 @@ describe('redactor', () => {
     );
     process.env['REDACTOR_API_KEY_SECRET'] = '/img/playwright-logo.svg';
     const redactor = new Redactor(workingFolder, regexFile, configFile);
-    const result = redactor.redact();
+    const result = await redactor.redact();
     expect(result.totalFiles).toEqual(2);
-    expect(result.totalMatches).toEqual(88);
+    expect(result.totalMatches).toEqual(156);
     expect(result.redactions.length).toEqual(2);
 
     function setupWorkingFolder() {
@@ -75,7 +75,7 @@ describe('redactor', () => {
       log_level: 'info',
       environment_variables: [],
     });
-    const result = redactor.applyPartialRedaction('hello world');
+    const result = redactor.applyRedaction('hello world');
     expect(result).toEqual('he*******ld');
   });
 
@@ -85,8 +85,38 @@ describe('redactor', () => {
       log_level: 'info',
       environment_variables: [],
     });
-    const result = redactor.applyPartialRedaction('test');
+    const result = redactor.applyRedaction('test');
     expect(result).toEqual('****');
+  });
+
+  test('getRedactionCount(..) determines the number of redactions made to the file contents', async () => {
+    const fileContents =
+      'j_username=autofunctest.<REDACTED>0073&j_password=A%21%40ds_Suan<REDACTED>%5B24%5D';
+    const result = redactor.getRedactionCount(fileContents, '<REDACTED>');
+    expect(result).toEqual(2);
+  });
+
+  test('decodeContent(..) apply decoding of the content when file type is .dat', async () => {
+    const fileContents =
+      'j_username=autofunctest.0073&j_password=A%21%40ds_Suan%5B24%5D';
+    const result = redactor.decodeContent(
+      'c:/random/1-trace.dat',
+      fileContents
+    );
+    expect(result).toEqual(
+      'j_username=autofunctest.0073&j_password=A!@ds_Suan[24]'
+    );
+  });
+
+  test('decodeContent(..) does not decode when file type is not .dat', async () => {
+    const fileContents = `
+    j_username=ffs.0073&j_password=<A!@fbcc_Juan[44]
+    `;
+    const result = redactor.decodeContent(
+      'c:/random/1-trace.trace',
+      fileContents
+    );
+    expect(result).toEqual(fileContents);
   });
 
   test('applyRegex(..) returns no replacements if no regexes match', async () => {
@@ -218,8 +248,10 @@ describe('redactor', () => {
   });
 
   test('humanizeDuration(..) format processing time', async () => {
-    const result = redactor.humanizeDuration(1001);
+    let result = redactor.humanizeDuration(1001);
     expect(result).toEqual('1 second(s)');
+    result = redactor.humanizeDuration(120_000);
+    expect(result).toEqual('2 minute(s)');
   });
 
   test('parses regex from file into an array', async () => {

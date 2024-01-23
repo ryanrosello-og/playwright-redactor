@@ -32,7 +32,7 @@ export class Redactor {
     }
   }
 
-  redact() {
+  async redact() {
     let result = {
       duration: '',
       totalFiles: 0,
@@ -44,7 +44,7 @@ export class Redactor {
     const startTime = performance.now();
     const traceFiles = this.getAllZipFiles(this.traceFolderPath);
     for (const traceFile of traceFiles) {
-      const reduction = this.redactTraceFile(traceFile);
+      const reduction = await this.redactTraceFile(traceFile);
       totalMatches += reduction.reduce(
         (sum, redaction) => sum + redaction.matchCount,
         0
@@ -69,44 +69,68 @@ export class Redactor {
     return result;
   }
 
-  redactTraceFile(traceFile: string) {
+  async redactTraceFile(traceFile: string) {
     unzip(traceFile);
     const zipFolder = getZipTargetFolder(traceFile);
-    const replacements = this.applyRegexes(zipFolder);
+    const replacements = await this.applyRegexes(zipFolder);
     zip(zipFolder);
     cleanFolder(zipFolder);
     return replacements;
   }
 
-  applyRegexes(zipFolder: string) {
+  async applyRegexes(zipFolder: string) {
     const filesForRedaction = findFilesInDirectory(zipFolder, REDACT_FILE_EXT);
     const result = [];
+    const promises = [];
     for (const file of filesForRedaction) {
-      const readFileResult = readFile(file);
-      if (readFileResult.success) {
-        // Apply regexes from the regex file first
-        const regexResult = this.applyRegex(file, readFileResult.data);
-        if (regexResult.replacements.length > 0) {
-          result.push(...regexResult.replacements);
-          writeToFile(file, regexResult.fileContents);
-        }
+      promises.push(this.regexFileContents(file));
+    }
+    const parallelPromises = 5;
+    for (let i = 0; i < promises.length; i += parallelPromises) {
+      const batch = promises.slice(i, i + parallelPromises);
+      const batchResult = await Promise.all(batch);
+      result.push(...batchResult.flat());
+    }
 
-        // Using the modified outcome from above, apply the env var regexes
-        const regexEnvsResult = this.applyEnvVarRegex(
-          file,
-          regexResult.fileContents
-        );
-        if (regexEnvsResult.replacements.length > 0) {
-          result.push(...regexEnvsResult.replacements);
-          writeToFile(file, regexEnvsResult.fileContents);
-        }
-      } else {
-        logger.warn(
-          `Unable to read file ${file}, skipping.  Error: [${readFileResult?.error}]`
-        );
+    return result;
+  }
+
+  async regexFileContents(file: string) {
+    const result = [];
+
+    const readFileResult = readFile(file);
+    if (readFileResult.success) {
+      // Apply regexes from the regex file first
+      const regexResult = this.applyRegex(
+        file,
+        this.decodeContent(file, readFileResult.data)
+      );
+      if (regexResult.replacements.length > 0) {
+        result.push(...regexResult.replacements);
+        writeToFile(file, regexResult.fileContents);
       }
+
+      // Using the modified outcome from above, apply the env var regexes
+      const regexEnvsResult = this.applyEnvVarRegex(
+        file,
+        this.decodeContent(file, regexResult.fileContents)
+      );
+      if (regexEnvsResult.replacements.length > 0) {
+        result.push(...regexEnvsResult.replacements);
+        writeToFile(file, regexEnvsResult.fileContents);
+      }
+    } else {
+      logger.warn(
+        `Unable to read file ${file}, skipping.  Error: [${readFileResult?.error}]`
+      );
     }
     return result;
+  }
+
+  decodeContent(file: string, fileContents: string) {
+    return file.endsWith('.dat')
+      ? decodeURIComponent(fileContents)
+      : fileContents;
   }
 
   applyRegex(file: string, fileContents: string) {
@@ -138,20 +162,21 @@ export class Redactor {
     for (const e of this.config.environment_variables) {
       if (!process.env[e]) continue;
       const envVarEscaped = this.escapeRegExp(process.env[e]);
-      const redactionResult = this.doRegexReplace(
-        fileContents,
-        new RegExp(envVarEscaped, 'g')
+      const redactionText = this.applyRedaction(envVarEscaped);
+      const redactionResult = fileContents.replaceAll(
+        envVarEscaped,
+        redactionText
       );
-
-      if (redactionResult.matchCount > 0) {
+      const matchCount = this.getRedactionCount(redactionResult, redactionText);
+      if (redactionResult !== fileContents) {
         replacements.push({
           file,
           regex: e,
-          matchCount: redactionResult.matchCount,
+          matchCount,
         });
       }
 
-      fileContents = redactionResult.redactedContent;
+      fileContents = redactionResult;
     }
     return {
       replacements,
@@ -159,8 +184,13 @@ export class Redactor {
     };
   }
 
-  escapeRegExp(str: string) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  getRedactionCount(fileContents: string, redaction: string): number {
+    const array = fileContents.split(redaction);
+    return array.length - 1;
+  }
+
+  escapeRegExp(str: unknown) {
+    return String(str);
   }
 
   doRegexReplace(
@@ -174,15 +204,17 @@ export class Redactor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const redactedContent = fileContents.replaceAll(regex, match => {
       matchCount++;
-      return this.config.full_redaction
-        ? REDACTED
-        : this.applyPartialRedaction(match);
+      return this.applyRedaction(match);
     });
 
     return {redactedContent, matchCount};
   }
 
-  applyPartialRedaction(input: string) {
+  applyRedaction(input: string) {
+    if (this.config.full_redaction) {
+      return REDACTED;
+    }
+
     const startLength = 2;
     const endLength = 2;
     const maskCharacter = '*';

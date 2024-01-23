@@ -44,7 +44,7 @@ The config file is a JSON file that contains the following properties:
 ```json
 {
   "full_redaction": true,
-  "logLevel": "debug",
+  "log_level": "debug",
   "environment_variables": [
     "SUPER_SECRET_PASSWORD",
     "SUPER_SECRET_API_KEY",
@@ -60,9 +60,11 @@ The config file above will perform a full redaction whenever a regex is matched 
 | -------- | -------- |
 | `full_redaction`   | **REQUIRED:** When set to `true`, a matched regex will be replaced with <REDACTED>. When set to `false`, the app will obscure large parts of the secret. For example: `password1234` will be redaced as `pa******32`   |
 |`environment_variables`   | **OPTIONAL:** The value of these environment variables will be redacted from the trace files  |
-|`regexes`   | **REQUIRED:** A text file where all of the regexes are defined. See details below.  |
+|`log_level`   | **REQUIRED:** Defaults to debug  |
 
 ## 🗎 Regex file
+
+This is a text required by the tool via the `-r` or `--regexes` command line option.
 
 The regex file will contain a list of regexes that will be used to replace the text in the trace files separated by a newline. The following example will search for super_password followed by 3 digits and replace it with <REDACTED>. It will also search for all GUIDs and replace it with <REDACTED>.  Lastly, it will search for all JWTs and replace it with <REDACTED>.
 
