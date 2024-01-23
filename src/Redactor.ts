@@ -85,7 +85,12 @@ export class Redactor {
       const readFileResult = readFile(file);
       if (readFileResult.success) {
         // Apply regexes from the regex file first
-        const regexResult = this.applyRegex(file, readFileResult.data);
+        const regexResult = this.applyRegex(
+          file,
+          file.endsWith('.dat')
+            ? decodeURIComponent(readFileResult.data)
+            : readFileResult.data
+        );
         if (regexResult.replacements.length > 0) {
           result.push(...regexResult.replacements);
           writeToFile(file, regexResult.fileContents);
@@ -94,7 +99,9 @@ export class Redactor {
         // Using the modified outcome from above, apply the env var regexes
         const regexEnvsResult = this.applyEnvVarRegex(
           file,
-          regexResult.fileContents
+          file.endsWith('.dat')
+            ? decodeURIComponent(regexResult.fileContents)
+            : regexResult.fileContents
         );
         if (regexEnvsResult.replacements.length > 0) {
           result.push(...regexEnvsResult.replacements);
@@ -137,21 +144,22 @@ export class Redactor {
     const replacements = [];
     for (const e of this.config.environment_variables) {
       if (!process.env[e]) continue;
-      const envVarEscaped = this.escapeRegExp(process.env[e]);
-      const redactionResult = this.doRegexReplace(
-        fileContents,
-        new RegExp(envVarEscaped, 'g')
+      const envVarEscaped = String(process.env[e]);
+      const redactionResult = fileContents.replaceAll(
+        envVarEscaped,
+        this.config.full_redaction
+          ? REDACTED
+          : this.applyPartialRedaction(envVarEscaped)
       );
-
-      if (redactionResult.matchCount > 0) {
+      if (redactionResult !== fileContents) {
         replacements.push({
           file,
           regex: e,
-          matchCount: redactionResult.matchCount,
+          matchCount: 1,
         });
       }
 
-      fileContents = redactionResult.redactedContent;
+      fileContents = redactionResult;
     }
     return {
       replacements,

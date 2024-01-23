@@ -47,8 +47,14 @@ program
       return;
     }
     for (const table of result.redactions) {
-      table.printTable();
-      console.log('\n'); // leave a gap between each table
+      try {
+        if (table.table.rows.length > 0) {
+          table.printTable();
+          console.log('\n'); // leave a gap between each table
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
     logger.info(
       `✅ Redactor completed [${result.duration}]

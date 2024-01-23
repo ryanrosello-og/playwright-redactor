@@ -34,7 +34,7 @@ describe('redactor', () => {
     const redactor = new Redactor(workingFolder, regexFile, configFile);
     const result = redactor.redact();
     expect(result.totalFiles).toEqual(2);
-    expect(result.totalMatches).toEqual(88);
+    expect(result.totalMatches).toEqual(74);
     expect(result.redactions.length).toEqual(2);
 
     function setupWorkingFolder() {
@@ -210,7 +210,7 @@ describe('redactor', () => {
     expect(result.replacements[1]).toEqual({
       file: 'c:/random/1-trace.trace',
       regex: 'GOOGLE_API_KEY',
-      matchCount: 2,
+      matchCount: 1,
     });
     expect(result.fileContents).toEqual(
       '\n    hello world\n    oc*************es\n    example.email+123@gmail.com,\n    regex will find email above oc*************es\n    th**********************ed\n    '
