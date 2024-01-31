@@ -1,6 +1,6 @@
 # playwright-redactor
 
-[![Coverage Status](https://coveralls.io/repos/github/ryanrosello-og/playwright-redactor/badge.svg?branch=add-gh-workflow)](https://coveralls.io/github/ryanrosello-og/playwright-redactor?branch=add-gh-workflow) [![vitests](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml/badge.svg)](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml) [![CodeQL](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/codeql.yml/badge.svg)](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/codeql.yml)
+[![Coverage Status](https://coveralls.io/repos/github/ryanrosello-og/playwright-redactor/badge.svg?branch=add-gh-workflow)](https://coveralls.io/github/ryanrosello-og/playwright-redactor?branch=add-gh-workflow) [![vitests](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml/badge.svg)](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/tests.yml) [![CodeQL](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/codeql.yml/badge.svg)](https://github.com/ryanrosello-og/playwright-redactor/actions/workflows/codeql.yml) <a href="https://www.buymeacoffee.com/ryanrosello.og"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" height="20px"></a>
 
 
 
@@ -77,3 +77,6 @@ super_[AB]_password\d{3}
 ## ⚠️ WARNING 🐊 - ACHTUNG !!
 
 In all cases, the redaction of passwords and other sensitive information may not enough to protect your data. You should always be careful when sharing trace files with strangers on the internet. As an extra precaution, try and scrub session information e.g jwt token, cookies etc from your trace files.
+
+
+https://www.buymeacoffee.com/ryanrosello.og
